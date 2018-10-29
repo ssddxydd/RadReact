@@ -26,7 +26,7 @@ int nrhs;   /* counts function evaluations */
             
 int main(void)
 {
-  
+
 
  /* Particle variables - change to arrays later
      u,v,w are spatial components of 4-momentum u=p/mc
@@ -90,16 +90,15 @@ int main(void)
 
 
   /****************************************************************/
-  yvec=dvector(1,N);// N= 6
-  
+  yvec=dvector(1,N);
 
-  B=dvector(1,3);// B field
-  E=dvector(1,3);//E field
+  B=dvector(1,3);
+  E=dvector(1,3);
 
 
   /* particle begin and end times (in proper time this may be very long) */
   x1=0.0;
-  x2=2.*PI*1.e3; 
+  x2=2.*PI*1.e3;
 
   /* maximum number of output points from odeint */
   kmax=1.e4;
@@ -131,18 +130,18 @@ int main(void)
 
   gamma=gamma0;
 #if CARTESIAN
-  yvec[1]=x_0;//position (xyz)
+  yvec[1]=x_0;
   yvec[2]=y_0;
   yvec[3]=z_0;
-  yvec[4]=betax*gamma;//rel velocity (xyz)
+  yvec[4]=betax*gamma;
   yvec[5]=betay*gamma;
   yvec[6]=betaz*gamma;
 #endif
 #if SPHERICAL
-  yvec[1]=x_0;//position (xyz)
+  yvec[1]=x_0;
   yvec[2]=y_0;
   yvec[3]=z_0;
-  yvec[4]=beta*gamma; //
+  yvec[4]=beta*gamma;
   yvec[5]=betax/beta;
   yvec[6]=atan2(betay,betaz);
 #endif
@@ -173,11 +172,9 @@ int main(void)
 
 
   
-  trace=fopen("ode.dat","w");
+  trace=fopen("trace.dat","w");
   
 
-
- 
   for (i=1;i<=kount;i++){
     
 #if CARTESIAN
@@ -229,7 +226,7 @@ int main(void)
   time=x1;
   htry=.1;
 
-  trace=fopen("boris.dat","w");
+  trace=fopen("trace.dat","w");
   i=0;
   while(time<x2){
 
@@ -287,7 +284,7 @@ int main(void)
     dummy=(E[1]*u1+E[2]*v1+E[3]*w1)*invgam;
     mod-=dummy*dummy;
 
-   rad_force=gamma*mod*RADCOEFF*htry;
+    rad_force=gamma*mod*RADCOEFF*htry;
   
   // dummy=cos(x-y[3])*cos(x-y[3])*(gam-y[6])*(gam-y[6])/(gam*gam);
   // printf("Rad force: mod= %e f= %e\n", mod, rad_force );
@@ -296,21 +293,6 @@ int main(void)
      vp -= rad_force*v1;
      wp -= rad_force*w1;
 
-  dummy=(E[2]*B[3]-E[3]*B[2])+invgam*(B[1]*(B[1]*ux+B[2]*uy+B[3]*uz)-ux*(B[1]*B[1]+B[2]*B[2]+B[3]*B[3]));
-  dummy+=E[1]*(E[1]*ux+E[2]*uy+E[3]*uz)*invgam;
-  dummy*=RADCOEFF*htry;
-  up += dummy;
-  
-  dummy=(E[3]*B[1]-E[1]*B[3])+invgam*(B[2]*(B[1]*ux+B[2]*uy+B[3]*uz)-uy*(B[1]*B[1]+B[2]*B[2]+B[3]*B[3]));
-  dummy+=E[2]*(E[1]*ux+E[2]*uy+E[3]*uz)*invgam;
-  dummy*=RADCOEFF*htry;
-  vp += dummy;
-  
-  dummy=(E[1]*B[2]-E[2]*B[1])+invgam*(B[3]*(B[1]*ux+B[2]*uy+B[3]*uz)-uz*(B[1]*B[1]+B[2]*B[2]+B[3]*B[3]));
-  dummy+=E[3]*(E[1]*ux+E[2]*uy+E[3]*uz)*invgam;
-  dummy*=RADCOEFF*htry;
-  wp += dummy;
-     
 #endif
 
  /* update position using new velocities*/
@@ -399,12 +381,10 @@ void derivs(double x,double y[],double dydx[])   {
 
   double q=CHARGE;
 
-  double mod, rad_force,corr;
+  double mod, rad_force;
 
   double ex,ey,ez;
   double a, b, c;
-  double ux, uz ,uy;
-  double du,dmu,dphi,dux,duy,duz;
 
   extern int nrhs;
 
@@ -433,7 +413,7 @@ void derivs(double x,double y[],double dydx[])   {
 
 #if SPHERICAL
 
- /*    1 2 3 4   5     6        */
+  /*    1 2 3 4   5     6        */
   /* y=[x,y,z,u,mu,phi] */
 
   /*
@@ -488,7 +468,7 @@ void derivs(double x,double y[],double dydx[])   {
   // dummy=cos(x-y[3])*cos(x-y[3])*(gam-y[6])*(gam-y[6])/(gam*gam);
   // printf("Rad force: mod= %e f= %e\n", mod, rad_force );
   
-  dydx[4] -= rad_force*y[4];// - fr * v
+  dydx[4] -= rad_force*y[4];
   dydx[5] -= rad_force*y[5];
   dydx[6] -= rad_force*y[6];
 
@@ -502,8 +482,8 @@ void derivs(double x,double y[],double dydx[])   {
   dydx[1] = bet*ex;
   dydx[2] = bet*ey;
   dydx[3] = bet*ez;
-  dydx[4] = q*(E[1]*ex+E[2]*ey+E[3]*ez);// q(E.e)
-  dydx[5] = (E[1]*sin2-ex*(E[2]*ey+E[3]*ez))*invu;//
+  dydx[4] = q*(E[1]*ex+E[2]*ey+E[3]*ez);
+  dydx[5] = (E[1]*sin2-ex*(E[2]*ey+E[3]*ez))*invu;
   dydx[5] += (B[3]*ey-B[2]*ez)*invgam;
   dydx[5] *= q;
   
@@ -517,13 +497,12 @@ void derivs(double x,double y[],double dydx[])   {
   
 
 #if RADREACT
- 
-  ux*=y[4]; uy*=y[4]; uz*=y[4];
-  a=E[1]+(uy*B[3]-uz*B[2])*invgam;
-  b=E[2]+(uz*B[1]-ux*B[3])*invgam;
-  c=E[3]+(ux*B[2]-uy*B[1])*invgam;
+  ex*=y[4]; ey*=y[4]; ez*=y[4];
+  a=E[1]+(ey*B[3]-ez*B[2])*invgam;
+  b=E[2]+(ez*B[1]-ex*B[3])*invgam;
+  c=E[3]+(ex*B[2]-ey*B[1])*invgam;
   mod=a*a+b*b+c*c;
-  dummy=(E[1]*ux+E[2]*uy+E[3]*uz)*invgam;
+  dummy=(E[1]*ex+E[2]*ey+E[3]*ez)*invgam;
   mod-=dummy*dummy;
   
   rad_force=gam*mod*RADCOEFF;
@@ -532,44 +511,8 @@ void derivs(double x,double y[],double dydx[])   {
   // printf("Rad force: mod= %e f= %e\n", mod, rad_force );
   
   dydx[4] -= rad_force*y[4];
-  corr = ex*(E[2]*B[3]-E[3]*B[2])+ey*(E[3]*B[1]-E[1]*B[3])+ez*(E[1]*B[2]-E[2]*B[1]);//e.(ExB)
-  corr += (B[1]*ex+B[2]*ey+B[3]*ez)*(B[1]*ux+B[2]*uy+B[3]*uz)*invgam; //+(B.e)(B.u)/gamma
-  corr -=(B[1]*B[1]+B[2]*B[2]+B[3]*B[3])*(ex*ux+ey*uy+ez*uz)*invgam; //-B^2*(e.u)/gamma
-  corr -= (E[1]*ex+E[2]*ey+E[3]*ez)*(E[1]*ux+E[2]*uy+E[3]*uz)*invgam;//-(E.e)(E.u)/gamma
-  corr*=RADCOEFF;
-  dydx[4] +=corr; //d|u|/dt
-  du = dydx[4];
-
-  
- 
-  dux=(E[2]*B[3]-E[3]*B[2])+invgam*(B[1]*(B[1]*ux+B[2]*uy+B[3]*uz)-ux*(B[1]*B[1]+B[2]*B[2]+B[3]*B[3]));
-  //+(Ey*Bz-Ez*By)+Bx(B.u)-ux(B^2/gam)
-  dux+=E[1]*(E[1]*ux+E[2]*uy+E[3]*uz)*invgam-gam*ux*mod;
-  //Ex*(E.u)/gam-gam*|u|*(E+uxB/gam)^2|x - (E.u/gam)^2|x
-  dux*= RADCOEFF;
-  //q(Ex+(uy*Bz-uz*By)/gam)
-  dux+=q*(E[1]+(uy*B[3]-uz*B[2])*invgam);
-
-  
-  
-  duy=(E[3]*B[1]-E[1]*B[3])+invgam*(B[2]*(B[1]*ux+B[2]*uy+B[3]*uz)-uy*(B[1]*B[1]+B[2]*B[2]+B[3]*B[3]));
-  duy+=E[2]*(E[1]*ux+E[2]*uy+E[3]*uz)*invgam-gam*uy*mod);
-  duy*= RADCOEFF;
-  duy=q*(E[2]+(uz*B[1]-ux*B[3])*invgam);
 
 
- 
-  duz=(E[1]*B[2]-E[2]*B[1])+invgam*(B[3]*(B[1]*ux+B[2]*uy+B[3]*uz)-uz*(B[1]*B[1]+B[2]*B[2]+B[3]*B[3]));
-  duz+=E[3]*(E[1]*ux+E[2]*uy+E[3]*uz)*invgam-gam*uz*mod);
-  duz*= RADCOEFF;
-  duz=q*(E[3]+(ux*B[2]-uy*B[1])*invgam);
-
-dmu = (dux - ex*dydx[4])/y[4];// dux/dt - cos(theta)*d|u|/dt
-dphi = (1/(y[4]*y[4]*sin2))*(uy*duz-uz*duy);//(1/(|u|^2sin^2(theta)) * (uy*duz/dt-uz*duy/dt)
-dydx[5] = dmu;
-dydx[6] = dphi;
-
-  
 #endif
 
 #endif
